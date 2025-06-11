@@ -1,81 +1,106 @@
-import { useState } from 'react'
-import './App.css'
-import './Form'
-
+import { useState } from 'react';
+import './App.css';
 
 const TodoList = () => {
   const [tasks, setTasks] = useState([]);
-  const [Maintopic, setMaintopic] = useState("");
-  const [Subtopic, setSubtopic] = useState("");
-  const [content, setcontent] = useState("");
+  const [mainTopic, setMainTopic] = useState('');
+  const [subTopic, setSubTopic] = useState('');
+  const [content, setContent] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  
-    const newTask = { mainTopic: Maintopic, subTopic: Subtopic, content };
-    setTasks([...tasks, newTask]);
+    if (!mainTopic.trim() || !subTopic.trim()) {
+      alert('Please fill in both the main and sub topics.');
+      return;
+    }
 
-    
-    setMaintopic("");
-    setSubtopic("");
-    setcontent("");
+    const newTask = {
+      id: Date.now(),
+      mainTopic: mainTopic.trim(),
+      subTopic: subTopic.trim(),
+      content: content.trim(),
+      completed: false,
+    };
+
+    setTasks([newTask, ...tasks]);
+    setMainTopic('');
+    setSubTopic('');
+    setContent('');
   };
 
-  const handleTaskCompletion = (index) => {
-   
-    const updatedTasks = [...tasks];
-    updatedTasks[index].completed = !updatedTasks[index].completed;
-    setTasks(updatedTasks);
+  const toggleTaskCompletion = (id) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const removeTask = (id) => {
+    const confirmed = window.confirm('Are you sure you want to delete this task?');
+    if (confirmed) {
+      setTasks(tasks.filter((task) => task.id !== id));
+    }
   };
 
   return (
-    <main>
+    <main className="todo-container">
       <form className="form" onSubmit={handleSubmit}>
-        <legend>Add Task</legend>
+        <legend>Add a Task</legend>
+
         <input
-          placeholder="main text"
           type="text"
-          className="main_topic"
-          value={Maintopic}
-          onChange={(event) => {
-            setMaintopic(event.target.value);
-          }}
+          placeholder="Main Topic"
+          className="input main_topic"
+          value={mainTopic}
+          onChange={(e) => setMainTopic(e.target.value)}
         />
+
         <input
-          placeholder="sub text"
           type="text"
-          className="sub_topic"
-          value={Subtopic}
-          onChange={(event) => {
-            setSubtopic(event.target.value);
-          }}
+          placeholder="Sub Topic"
+          className="input sub_topic"
+          value={subTopic}
+          onChange={(e) => setSubTopic(e.target.value)}
         />
+
         <textarea
-          className="text_topic"
+          placeholder="Additional Notes"
+          className="input text_topic"
           value={content}
-          onChange={(event) => {
-            setcontent(event.target.value);
-          }}
-        />
-        <input type="submit" value="Add Task" />
+          onChange={(e) => setContent(e.target.value)}
+        ></textarea>
+
+        <button type="submit" className="submit-btn">Add Task</button>
       </form>
 
-      <section>
+      <section className="task-list">
         <h2>Task List</h2>
-        <ul>
-          {tasks.map((task, index) => (
-            <li key={index} className={task.completed ? "completed" : ""}>
-              <span>{task.mainTopic} - {task.subTopic}</span>
-              <button onClick={() => handleTaskCompletion(index)}>
-                {task.completed ? "Undo" : "Complete"}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {tasks.length === 0 ? (
+          <p className="no-tasks">No tasks yet. Add something!</p>
+        ) : (
+          <ul>
+            {tasks.map((task) => (
+              <li key={task.id} className={`task-item ${task.completed ? 'completed' : ''}`}>
+                <div>
+                  <strong>{task.mainTopic}</strong> – {task.subTopic}
+                  {task.content && <p className="task-content">{task.content}</p>}
+                </div>
+                <div className="task-buttons">
+                  <button onClick={() => toggleTaskCompletion(task.id)}>
+                    {task.completed ? 'Undo' : 'Complete'}
+                  </button>
+                  <button onClick={() => removeTask(task.id)} className="delete-btn">Delete</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   );
 };
 
 export default TodoList;
+

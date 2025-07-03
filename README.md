@@ -16,7 +16,7 @@ This is a modern and customizable **React To-Do List App** where you can add tas
 ---
 
 ## 📁 Project Structure
-
+```
 project-root/
 ├── src/
 │ ├── App.css
@@ -26,7 +26,7 @@ project-root/
 │ └── index.html
 ├── package.json
 └── README.md
-
+```
 yaml
 Copy
 Edit
